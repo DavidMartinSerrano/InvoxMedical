@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using InvoxMedicalService.Services;
+using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using System;
@@ -9,10 +10,12 @@ namespace InvoxMedicalService.Commands
     public class UploadAudioCommandHandler : IRequestHandler<UploadAudioCommand, string>
     {
         private readonly ILogger<UploadAudioCommandHandler> _logger;
+        private readonly IAudioTranscriptionService _audioTranscriptionService;
 
-        public UploadAudioCommandHandler(ILogger<UploadAudioCommandHandler> logger)
+        public UploadAudioCommandHandler(ILogger<UploadAudioCommandHandler> logger, IAudioTranscriptionService audioTranscriptionService)
         {
             _logger = logger;
+            _audioTranscriptionService = audioTranscriptionService;
         }
 
         public Task<string> Handle(UploadAudioCommand request, CancellationToken cancellationToken)
@@ -25,7 +28,7 @@ namespace InvoxMedicalService.Commands
 
             try
             {
-                return Task.FromResult(TranscribeAudio(request.File, userProfile));
+                return Task.FromResult(_audioTranscriptionService.TranscribeAudio(request.File, userProfile));
             }
             catch (Exception ex)
             {
@@ -34,16 +37,6 @@ namespace InvoxMedicalService.Commands
             }
         }
 
-        private string TranscribeAudio(IFormFile file, string userProfile)
-        {
-            // This is a mock implementation to select a predefined text
-            var predefinedTexts = new[] { "Text 1", "Text 2", "Text 3", "Text 4" };
-            var random = new Random();
-            var selectedIndex = random.Next(0, predefinedTexts.Length);
-            var selectedText = predefinedTexts[selectedIndex];
-
-            // Include user profile in the transcription
-            return $"{selectedText} - Transcribed by: {userProfile}";
-        }
+       
     }
 }
