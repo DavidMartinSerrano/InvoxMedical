@@ -3,6 +3,10 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using MediatR;
+using InvoxMedicalService.Commands; // Import your command/handler namespaces
+using System.Reflection;
+using InvoxMedicalService.Services;
 
 namespace InvoxMedicalService
 {
@@ -19,6 +23,10 @@ namespace InvoxMedicalService
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
+
+            // Register MediatR and Handlers
+            services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
+            services.AddSingleton<IAudioTranscriptionService, AudioTranscriptionService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -28,11 +36,14 @@ namespace InvoxMedicalService
             {
                 app.UseDeveloperExceptionPage();
             }
+            else
+            {
+                app.UseExceptionHandler("/Error");
+                app.UseHsts();
+            }
 
             app.UseHttpsRedirection();
-
             app.UseRouting();
-
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
