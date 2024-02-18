@@ -26,7 +26,7 @@ namespace InvoxMedicalService
 
             // Register MediatR and Handlers
             services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
-            services.AddSingleton<IAudioTranscriptionService, AudioTranscriptionService>();
+            services.AddTransient<IAudioTranscriptionService, AudioTranscriptionService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

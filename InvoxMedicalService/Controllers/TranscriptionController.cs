@@ -15,6 +15,7 @@ namespace InvoxMedicalService.Controllers
     {
         private readonly IMediator _mediator;
         private readonly ILogger<TranscriptionController> _logger;
+        private static readonly Random _random = new Random();
 
         public TranscriptionController(IMediator mediator, ILogger<TranscriptionController> logger)
         {
@@ -25,6 +26,13 @@ namespace InvoxMedicalService.Controllers
         [HttpPost("upload")]
         public async Task<IActionResult> UploadFile(IFormFile file, [FromForm] string userProfile)
         {
+            bool shouldFail = _random.Next(0, 100) < 5; // 5% failure rate
+            if (shouldFail)
+            {
+                // Simulate a failure with a 500 Internal Server Error
+                return new StatusCodeResult(500); 
+            }
+
             try
             {
                 if (file == null || file.Length == 0)
@@ -43,7 +51,7 @@ namespace InvoxMedicalService.Controllers
                 _logger.LogError(ex, "Error processing file.");
                 return StatusCode(500, "An error occurred while processing the file.");
             }
-        }
-    }
+        }       
+}
 
 }
